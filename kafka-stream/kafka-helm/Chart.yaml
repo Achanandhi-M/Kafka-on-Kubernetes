@@ -1,0 +1,4 @@
+apiVersion: v2
+name: my-kafka-chart
+description: A Helm chart for deploying Zookeeper, Kafka, Kafka Producer, and Kafka Consumer
+version: 0.1.0

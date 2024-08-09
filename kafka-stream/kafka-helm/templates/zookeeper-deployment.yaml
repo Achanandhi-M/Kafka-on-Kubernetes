@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+spec:
+  replicas: {{ .Values.zookeeper.replicaCount }}
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: "{{ .Values.zookeeper.image.repository }}:{{ .Values.zookeeper.image.tag }}"
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOO_TICK_TIME
+              value: "{{ .Values.zookeeper.configuration.tickTime }}"
+            - name: ZOO_INIT_LIMIT
+              value: "{{ .Values.zookeeper.configuration.initLimit }}"
+            - name: ZOO_SYNC_LIMIT
+              value: "{{ .Values.zookeeper.configuration.syncLimit }}"
+          resources:
+            requests:
+              cpu: {{ .Values.zookeeper.resources.requests.cpu }}
+              memory: {{ .Values.zookeeper.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.zookeeper.resources.limits.cpu }}
+              memory: {{ .Values.zookeeper.resources.limits.memory }}

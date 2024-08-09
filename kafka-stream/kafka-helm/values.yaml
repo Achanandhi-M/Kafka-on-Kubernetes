@@ -1,0 +1,85 @@
+# Default values for my-kafka-chart.
+
+zookeeper:
+  image:
+    repository: bitnami/zookeeper
+    tag: 3.8.0
+    pullPolicy: IfNotPresent
+  replicaCount: 3
+  service:
+    type: ClusterIP
+    port: 2181
+  configuration:
+    tickTime: "2000"
+    initLimit: "10"
+    syncLimit: "5"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+kafka:
+  image:
+    repository: bitnami/kafka
+    tag: 3.4.0
+    pullPolicy: IfNotPresent
+  replicaCount: 3
+  service:
+    type: ClusterIP
+    port: 9092
+  configuration:
+    broker:
+      log.retention.hours: "168"
+      num.partitions: "3"
+      zookeeper:
+        connect: "zookeeper:2181"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+kafkaProducer:
+  image:
+    repository: achanandhi/kafka-producer
+    tag: v1
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    - name: KAFKA_BROKER
+      value: "kafka:9092"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+kafkaConsumer:
+  image:
+    repository: achanandhi/kafka-consumer
+    tag: v1
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    - name: KAFKA_BROKER
+      value: "kafka:9092"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
