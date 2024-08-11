@@ -1,14 +1,21 @@
 from kafka import KafkaProducer
-import os
-import signal
-import sys
+from kafka import KafkaConsumer
+import threading
 
-# Set up the producer with Kafka bootstrap server from environment variable
-bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
-producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
+# Set up the producer
+producer = KafkaProducer(bootstrap_servers='10.43.72.142:9092')
+
+# Set up the consumer
+consumer = KafkaConsumer(
+    'user2-topic',
+    bootstrap_servers='10.43.72.142:9092',
+    auto_offset_reset='earliest',
+    group_id='user1-group',
+    enable_auto_commit=True
+)
 
 def send_message():
-    print("Enter message to send. Type 'exit' to quit.")
+    print("Enter message to send  . Type 'exit' to quit.")
     while True:
         message = input("")
         if message.lower() == 'exit':
@@ -16,14 +23,13 @@ def send_message():
         producer.send('user1-topic', value=message.encode('utf-8'))
         producer.flush()
 
-def signal_handler(sig, frame):
-    print('Shutting down gracefully')
-    producer.close()
-    sys.exit(0)
+def receive_message():
+    for message in consumer:
+        print(f"Message from User 2: {message.value.decode('utf-8')}")
 
-# Register signal handlers for graceful shutdown
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
+# Start the consumer thread
+consumer_thread = threading.Thread(target=receive_message)
+consumer_thread.start()
 
 # Start the producer loop
 send_message()
